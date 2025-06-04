@@ -4,21 +4,21 @@
             <h1 v-if="puntaje >= 10">Puntaje: {{ puntaje }}</h1>
             <h2 v-if="puntaje >= 10">Felicitaciones has ganado un premio de $10.000,00</h2>
             <h1 v-else>Has utilizado tus 5 intentos</h1>
-            <h2 v-if="puntaje >= 0">El juego ha terminado, inténtalo nuevamente</h2>
+            <h2 v-if="puntaje < 10">El juego ha terminado, inténtalo nuevamente</h2>
         </div>
-
         <div class="puntaje">
             <h1>Puntaje: {{ puntaje }}</h1>
             <h1>Intento: {{ intento }}</h1>
         </div>
         <div class="imagenes">
-            <img v-for="(pokemon, index) in pokemones" :key="index" :src="pokemon.imagen" alt="pokemon.nombre">
+            <img v-for="pokemon in pokemones" :key="pokemon" :src="pokemon.imagen" alt="pokemon.nombre">
 
         </div>
         <div class="texto">
-            <p v-for="(pokemon, index) in pokemones" :key="index">{{ pokemon.nombre }}</p>
+            <p v-for="pokemon in pokemones" :key="pokemon">{{ pokemon.nombre }}</p>
         </div>
-        <button @click="intento < 5 ? jugar() : reiniciarJuego()">
+
+        <button @click="intento <5 ? jugar() : reiniciarJuego() ">
             {{ intento < 5 ? 'Jugar' : 'Jugar de nuevo' }} </button>
 
     </div>
@@ -44,19 +44,16 @@ export default {
             return this.intento >= 5;
         },
         mensajeColor() {
-            return this.puntaje >= 10 ? "azul" : "rojo";
+
         },
     },
     methods: {
         async jugar() {
-            if (this.intento >= 5) return;
-            this.intento++;
-
             const nuevosPokemones = [];
             const ids = [];
-
+            let repetidos = 0;
             for (let i = 0; i < 3; i++) {
-                const id = Math.floor(Math.random() * 151) + 1;
+                const id = Math.floor(Math.random() * 5) + 1;
 
                 try {
                     const data = await consumirPokemonFachada(id);
@@ -65,23 +62,22 @@ export default {
                         nombre: data.name,
                         imagen: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${id}.svg`
                     });
-                } catch (error) {
-                    console.error("Error al obtener Pokémon:", error);
+
+                } catch {
+                    console.error("Error al obtener ", error);
                 }
             }
-            const conteo = {};
-            ids.forEach(id => conteo[id] = (conteo[id] || 0) + 1);
-
-
-            const repeticiones = Object.values(conteo);
-            if (repeticiones.includes(3)) {
+            const [a, b, c] = ids;
+            if (a === b && b == c) {
                 this.puntaje += 5;
-            } else if (repeticiones.includes(2)) {
+                console.log("+5")
+            } else if (a === b || a == c || b == c) {
                 this.puntaje += 2;
+                console.log("+2")
             }
-
-
+            console.log(ids);
             this.pokemones = nuevosPokemones;
+            this.intento++;
         },
         reiniciarJuego() {
             this.puntaje = 0;

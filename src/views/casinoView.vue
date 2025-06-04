@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import casino from "@/components/casino.vue"
+import casino from "@/components/casino2.vue"
 export default {
     components: {
         casino,
